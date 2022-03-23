@@ -301,7 +301,6 @@ while True:
 					window.blit(game_images['background'], (0, 0))
 					window.blit(game_images['message'], (0, 0))
 					window.blit(game_images['flappybird'], (horizontal, vertical))
-					window.blit(game_images['sea_level'], (ground, elevation))
 					
 					# Just Refresh the screen
 					pygame.display.update()		
