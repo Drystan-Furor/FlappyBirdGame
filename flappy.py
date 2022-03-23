@@ -17,9 +17,10 @@ window_height = 499
 # set height and width of window
 window = pygame.display.set_mode((window_width, window_height))
 elevation = window_height * 0.8
-game_images = {}	
+game_images = {}
+game_audio_sound = {}
 framepersecond = 32
-pipeimage = 'images/pipe.png'
+pipe_image = 'images/pipe.png'
 background_image = 'images/background.jpg'
 birdplayer_image = 'images/bird.png'
 sealevel_image = 'images/base.jfif'
@@ -40,7 +41,7 @@ sealevel_image = 'images/base.jfif'
 # After that, we create a list of dictionaries that contains coordinates of upper and lower pipes and return it.
 def createPipe():
 	offset = window_height/3
-	pipeHeight = game_images['pipeimage'][0].get_height()
+	pipeHeight = game_images['pipe_image'][0].get_height()
 	
 	# generating random height of pipes
 	y2 = offset + random.randrange(
@@ -67,19 +68,25 @@ def createPipe():
 # Checking if bird is above the sealevel.
 def isGameOver(horizontal, vertical, up_pipes, down_pipes):
 	if vertical > elevation - 25 or vertical < 0:
+		game_audio_sound['hit'].play()
+		game_audio_sound['die'].play()
 		return True
 
 	# Checking if bird hits the upper pipe or not
 	for pipe in up_pipes:	
-		pipeHeight = game_images['pipeimage'][0].get_height()
+		pipeHeight = game_images['pipe_image'][0].get_height()
 		if(vertical < pipeHeight + pipe['y']
-		and abs(horizontal - pipe['x']) < game_images['pipeimage'][0].get_width()):
+		and abs(horizontal - pipe['x']) < game_images['pipe_image'][0].get_width()):
+			game_audio_sound['hit'].play()
+			game_audio_sound['die'].play()
 			return True
 			
 	# Checking if bird hits the lower pipe or not
 	for pipe in down_pipes:
 		if (vertical + game_images['flappybird'].get_height() > pipe['y']
-		and abs(horizontal - pipe['x']) < game_images['pipeimage'][0].get_width()):
+		and abs(horizontal - pipe['x']) < game_images['pipe_image'][0].get_width()):
+			game_audio_sound['hit'].play()
+			game_audio_sound['die'].play()
 			return True
 	return False
 
@@ -142,6 +149,8 @@ def flappygame():
 				if vertical > 0:
 					bird_velocity_y = bird_flap_velocity
 					bird_flapped = True
+					game_audio_sound['wing'].play()
+					game_audio_sound['swoosh'].play()
 
 		# This function will return true if the flappybird is crashed
 		game_over = isGameOver(horizontal, vertical, up_pipes, down_pipes)
@@ -151,10 +160,11 @@ def flappygame():
 		# check for your_score
 		playerMidPos = horizontal + game_images['flappybird'].get_width()/2
 		for pipe in up_pipes:
-			pipeMidPos = pipe['x'] + game_images['pipeimage'][0].get_width()/2
+			pipeMidPos = pipe['x'] + game_images['pipe_image'][0].get_width()/2
 			if pipeMidPos <= playerMidPos < pipeMidPos + 4:
 				# Printing the score
 				your_score += 1
+				game_audio_sound['point'].play()
 				print(f"Your your_score is {your_score}")
 
 		if bird_velocity_y < bird_Max_Vel_Y and not bird_flapped:
@@ -178,16 +188,16 @@ def flappygame():
 			down_pipes.append(newpipe[1])
 
 		# if the pipe is out of the screen, remove it
-		if up_pipes[0]['x'] < -game_images['pipeimage'][0].get_width():
+		if up_pipes[0]['x'] < -game_images['pipe_image'][0].get_width():
 			up_pipes.pop(0)
 			down_pipes.pop(0)
 
 		# Lets blit our game images now
 		window.blit(game_images['background'], (0, 0))
 		for upperPipe, lowerPipe in zip(up_pipes, down_pipes):
-			window.blit(game_images['pipeimage'][0],
+			window.blit(game_images['pipe_image'][0],
 						(upperPipe['x'], upperPipe['y']))
-			window.blit(game_images['pipeimage'][1],
+			window.blit(game_images['pipe_image'][1],
 						(lowerPipe['x'], lowerPipe['y']))
 
 		window.blit(game_images['sea_level'], (ground, elevation))
@@ -237,13 +247,21 @@ if __name__ == "__main__":
 		pygame.image.load('images/8.png').convert_alpha(),
 		pygame.image.load('images/9.png').convert_alpha()
 	)
+	game_images['message'] = pygame.image.load('images/message.png').convert_alpha()
 	game_images['flappybird'] = pygame.image.load(birdplayer_image).convert_alpha()				
 	game_images['sea_level'] = pygame.image.load(sealevel_image).convert_alpha()
 	game_images['background'] = pygame.image.load(background_image).convert_alpha()
-	game_images['pipeimage'] = (pygame.transform.rotate(pygame.image.load(pipeimage)
+	game_images['pipe_image'] = (pygame.transform.rotate(pygame.image.load(pipe_image)
 														.convert_alpha(),
 														180),
-								pygame.image.load(pipeimage).convert_alpha())
+								pygame.image.load(pipe_image).convert_alpha())
+	# Game sounds
+	game_audio_sound['die'] = pygame.mixer.Sound('sounds/die.wav')
+	game_audio_sound['hit'] = pygame.mixer.Sound('sounds/hit.wav')
+	game_audio_sound['point'] = pygame.mixer.Sound('sounds/point.wav')
+	game_audio_sound['swoosh'] = pygame.mixer.Sound('sounds/swoosh.wav')
+	game_audio_sound['wing'] = pygame.mixer.Sound('sounds/wing.wav')
+
 
 	print("WELCOME TO THE FLAPPY BIRD GAME")
 	print("Press space or enter to start the game")
@@ -281,6 +299,7 @@ while True:
 				# if user doesn't press anykey Nothing happen
 				else:
 					window.blit(game_images['background'], (0, 0))
+					window.blit(game_images['message'], (0, 0))
 					window.blit(game_images['flappybird'], (horizontal, vertical))
 					window.blit(game_images['sea_level'], (ground, elevation))
 					
