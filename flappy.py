@@ -12,18 +12,18 @@ from pygame.locals import *  # Basic pygame imports
 
 # Global Variables for the game
 window_width = 600
-window_height = 499
+window_height = 512
 
 # set height and width of window
 window = pygame.display.set_mode((window_width, window_height))
-elevation = window_height * 0.8
+elevation = window_height * 0.9
 game_images = {}
 game_audio_sound = {}
 framepersecond = 32
 pipe_image = 'images/pipe.png'
 background_image = 'images/background.jpg'
 birdplayer_image = 'images/bird.png'
-sealevel_image = 'images/base.jfif'
+sealevel_image = 'images/base.png'
 
 # After declaring game variables and importing libraries we have to initialize the Pygame 
 
@@ -67,7 +67,7 @@ def createPipe():
 #       and if the bird hits any of the lower and upper pip then this will also lead to game over condition.
 # Checking if bird is above the sealevel.
 def isGameOver(horizontal, vertical, up_pipes, down_pipes):
-	if vertical > elevation - 25 or vertical < 0:
+	if vertical > elevation - 61 or vertical < 0:
 		game_audio_sound['hit'].play()
 		game_audio_sound['die'].play()
 		return True
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 	framepersecond_clock = pygame.time.Clock()
 	
 	# Sets the title on top of game window
-	pygame.display.set_caption('Flappy Bird Game')	
+	pygame.display.set_caption('DOOM Cacodemon Game')	
 
 	# Load all the images which we will use in the game
 	# images for displaying score
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 	game_audio_sound['wing'] = pygame.mixer.Sound('sounds/wing.wav')
 
 
-	print("WELCOME TO THE FLAPPY BIRD GAME")
+	print("WELCOME TO THE DOOM CACODEMON GAME")
 	print("Press space or enter to start the game")
 
 
